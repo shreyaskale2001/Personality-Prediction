@@ -199,6 +199,20 @@ if st.button("Submit Assessment"):
 
         st.divider()
 
+        # ---------------- CANDIDATE PROFILE ----------------
+
+        st.header("Candidate Profile")
+
+        st.write("Name:", name)
+        st.write("Company:", company)
+        st.write("Job Role:", job_role)
+        st.write("Experience:", experience, "years")
+        st.write("Age:", age)
+
+        st.divider()
+
+        # ---------------- PERSONALITY RESULT ----------------
+
         st.header("Personality Result")
 
         st.success(f"Dominant Personality Trait: {dominant_trait}")
@@ -221,7 +235,7 @@ if st.button("Submit Assessment"):
 
             st.markdown("---")
 
-        # ---------------- SCORES AT BOTTOM ----------------
+        # ---------------- TRAIT SCORES AT BOTTOM ----------------
 
         st.header("Personality Trait Scores")
 
