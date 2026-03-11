@@ -188,38 +188,78 @@ for i,q in enumerate(questions):
     st.markdown("---")
 
 # ---------------- SUBMIT ----------------
+if st.button("Submit Assessment", type="primary"):
 
-if st.button("Submit Assessment",type="primary"):
+    errors = []
 
-    errors=[]
-
+    # Personal info validation
     if not name.strip():
-        errors.append("Name required")
+        errors.append("Full Name is required")
 
     if not job_role.strip():
-        errors.append("Job role required")
+        errors.append("Job Role is required")
 
     if not company.strip():
-        errors.append("Company required")
+        errors.append("Company name is required")
 
-    if experience<=0:
-        errors.append("Enter experience")
+    if experience <= 0:
+        errors.append("Years of Experience must be greater than 0")
 
-    if age<18:
-        errors.append("Age must be 18+")
+    if age < 18:
+        errors.append("Age must be 18 or above")
 
+    # Question validation
+    unanswered = []
+    for i in range(50):
+        if all_scores.get(f"question_{i}") is None:
+            unanswered.append(i + 1)
+
+    if unanswered:
+        errors.append(f"You must answer all questions. Missing: {unanswered}")
+
+    # Show errors
     if errors:
-
-        st.error("Please complete required fields")
-
+        st.error("Please complete all required fields")
         for e in errors:
             st.warning(e)
 
     else:
+        bigfive = calculate_big_five(all_scores)
 
-        bigfive=calculate_big_five(all_scores)
+        trait, description = interpret_personality(bigfive)
 
-        trait,description=interpret_personality(bigfive)
+        save_to_database(
+            name,
+            job_role,
+            company,
+            experience,
+            age,
+            all_scores,
+            trait
+        )
+
+        st.success("Assessment submitted successfully")
+
+        st.header("👤 Candidate Profile")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.write("Name:", name)
+            st.write("Company:", company)
+            st.write("Role:", job_role)
+
+        with col2:
+            st.write("Experience:", experience)
+            st.write("Age:", age)
+
+        st.divider()
+
+        st.subheader("Final Personality Result")
+
+        st.success(f"Dominant Personality Trait: {trait}")
+
+        st.write(description)
 
         # -------- Convert to percentage --------
 
