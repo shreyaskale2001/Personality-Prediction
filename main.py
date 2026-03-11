@@ -19,13 +19,61 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # ---------------- QUESTIONS ----------------
 
 questions = [
-"I am the life of the party","I don't talk a lot","I feel comfortable around people","I keep in the background","I start conversations","I have little to say","I talk to a lot of different people at parties","I don't like to draw attention to myself","I don't mind being the center of attention","I am quiet around strangers",
-"I get stressed out easily","I am relaxed most of the time","I worry about things","I seldom feel blue","I am easily disturbed","I get upset easily","I change my mood a lot","I have frequent mood swings","I get irritated easily","I often feel blue",
-"I feel little concern for others","I am interested in people","I insult people","I sympathize with others' feelings","I am not interested in other people's problems","I have a soft heart","I am not really interested in others","I take time out for others","I feel others' emotions","I make people feel at ease",
-"I am always prepared","I leave my belongings around","I pay attention to details","I make a mess of things","I get chores done right away","I often forget to put things back in their proper place","I like order","I shirk my duties","I follow a schedule","I am exacting in my work",
-"I have a rich vocabulary","I have difficulty understanding abstract ideas","I have a vivid imagination","I am not interested in abstract ideas","I have excellent ideas","I do not have a good imagination","I am quick to understand things","I use difficult words","I spend time reflecting on things","I am full of ideas"
-]
+"I enjoy being the center of attention at social events",
+"I usually don't talk much",
+"I feel comfortable when I am around people",
+"I prefer to stay in the background",
+"I often start conversations with others",
+"I usually don't have much to say",
+"I talk to many different people at gatherings",
+"I don't like being noticed by others",
+"I am okay with being the center of attention",
+"I tend to stay quiet around people I don't know",
 
+"I get stressed easily",
+"I usually feel relaxed",
+"I worry about many things",
+"I rarely feel sad",
+"I get upset easily",
+"I lose my temper easily",
+"My mood changes often",
+"I experience mood swings",
+"I get annoyed easily",
+"I often feel sad",
+
+"I don't care much about other people's problems",
+"I like learning about other people",
+"I sometimes say rude things to others",
+"I understand how others feel",
+"I don't show interest in other people's issues",
+"I am kind and caring toward others",
+"I don't pay much attention to others",
+"I like helping other people",
+"I can easily feel what others are feeling",
+"I try to make people feel comfortable",
+
+"I like to stay prepared",
+"I often leave my things lying around",
+"I pay close attention to small details",
+"I tend to be messy",
+"I complete tasks right away",
+"I sometimes forget to put things back where they belong",
+"I like things to be organized",
+"I sometimes avoid my responsibilities",
+"I like following a daily routine",
+"I try to do my work very carefully",
+
+"I know many words and express myself well",
+"I find it hard to understand complex ideas",
+"I have a strong imagination",
+"I am not very interested in deep ideas",
+"I often come up with good ideas",
+"I don't think I have much imagination",
+"I understand new things quickly",
+"I sometimes use advanced words when speaking",
+"I spend time thinking deeply about things",
+"I often think of new and creative ideas"
+]
 # ---------------- PERSONALITY CALCULATION ----------------
 
 def calculate_big_five(answers):
@@ -90,7 +138,7 @@ def save_to_database(name,job_role,company,experience,age,answers,personality,tr
 
 # ---------------- UI ----------------
 
-st.title("🧠 Personality & Profile Assessment")
+st.title("Personality Evaluation Survey")
 
 st.header("👤 Personal Information")
 
@@ -208,7 +256,7 @@ if st.button("Submit Assessment",type="primary"):
 
         st.divider()
 
-        st.subheader("🧠 Final Personality Result")
+        st.subheader("Final Personality Result")
 
         st.success(f"Dominant Personality Trait: {trait}")
 
