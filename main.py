@@ -220,3 +220,12 @@ if st.button("Submit Assessment"):
             st.info(f"Suitable Roles: {info['roles']}")
 
             st.markdown("---")
+
+            st.header("Personality Trait Scores")
+
+            for trait, score in bigfive.items():
+                percent = round((score / 5) * 100, 2)
+
+                st.write(f"{trait}: {percent}%")
+
+                st.progress(percent / 100)
