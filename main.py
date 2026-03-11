@@ -94,15 +94,45 @@ def interpret_personality(bigfive):
 
     dominant_trait = max(bigfive, key=bigfive.get)
 
-    descriptions = {
-        "Extraversion": "You are an **Extraverted Personality** who enjoys social interaction.",
-        "Neuroticism": "You may experience emotions strongly and react sensitively.",
-        "Agreeableness": "You are cooperative, kind, and compassionate.",
-        "Conscientiousness": "You are organized, responsible, and disciplined.",
-        "Openness": "You are creative and enjoy exploring new ideas."
-    }
+st.subheader("Personality Description & Suitable Organizational Roles")
+st.write("Below is the description of your dominant personality trait and some organizational roles that may suit your strengths.")
 
-    return dominant_trait, descriptions[dominant_trait]
+descriptions = {
+
+"Openness": {
+"desc": "You enjoy new experiences and are curious about the world. You appreciate art, adventure, and different ideas. You have a strong imagination and can quickly understand new concepts.",
+"Suitable roles": "Product Designer, Researcher, Innovation Manager, Strategy Analyst"
+},
+
+"Conscientiousness": {
+"desc": "You are disciplined and organized. You like planning things in advance, paying attention to details, and following schedules. You prefer structured and well-organized work.",
+"Suitable roles": "Project Manager, Operations Manager, Financial Analyst, Engineer"
+},
+
+"Extraversion": {
+"desc": "You enjoy being around people and often take the lead in social situations. You are energetic, talkative, and comfortable being the center of attention.",
+"Suitable roles": "Sales Manager, Marketing Executive, HR Manager, Public Relations Specialist"
+},
+
+"Agreeableness": {
+"desc": "You value harmony and good relationships with others. You are kind, helpful, and considerate of people’s feelings, which makes others feel comfortable around you.",
+"Suitable roles": "Human Resources Specialist, Counselor, Customer Success Manager, Teacher"
+},
+
+"Neuroticism": {
+"desc": "You may experience emotions strongly and sometimes feel stressed or worried. You can be sensitive to pressure and may prefer calm environments.",
+"Suitable roles": "Quality Assurance Analyst, Risk Analyst, Research Assistant, Data Analyst"
+}
+
+}
+
+trait, _ = interpret_personality(bigfive)
+
+st.success(f"Dominant Personality Trait: {trait}")
+
+st.write(descriptions[trait]["desc"])
+
+st.info(descriptions[trait]["roles"])
 
 # ---------------- SAVE TO DATABASE ----------------
 def save_to_database(name, job_role, company, experience, age, answers, personality, traits):
