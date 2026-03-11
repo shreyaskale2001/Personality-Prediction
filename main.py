@@ -5,21 +5,37 @@ from supabase import create_client
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="centered")
 
-# ---------------- MOBILE CSS ----------------
+# ---------------- MOBILE UI STYLE ----------------
 st.markdown("""
 <style>
-html, body, [class*="css"]  {
-    font-size: 14px;
+
+h1 {
+font-size:40px !important;
+text-align:center;
 }
-h1 {font-size:26px !important;}
-h2 {font-size:20px !important;}
-h3 {font-size:16px !important;}
-p, label {font-size:14px !important;}
+
+h2 {
+font-size:28px !important;
+}
+
+h3 {
+font-size:22px !important;
+}
+
+p, label {
+font-size:18px !important;
+}
+
+.stRadio > label {
+font-size:18px !important;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("## Personality Evaluation Survey")
-st.caption("Answer the questions to understand your personality traits.")
+# ---------------- TITLE ----------------
+st.markdown("# Personality Evaluation Survey")
+st.caption("Answer all questions to discover your personality traits.")
 
 # ---------------- SUPABASE ----------------
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -84,64 +100,47 @@ questions = [
 "I often think of new and creative ideas"
 ]
 
-# ---------------- SESSION STATE ----------------
-if "answers" not in st.session_state:
-    st.session_state.answers = {}
-
-if "q_index" not in st.session_state:
-    st.session_state.q_index = 0
-
 # ---------------- PERSONAL INFO ----------------
-st.subheader("Personal Information")
+st.header("Personal Information")
 
 name = st.text_input("Full Name")
 job_role = st.text_input("Current Job Role")
 company = st.text_input("Current Company")
 
-experience = st.number_input("Years of Experience", min_value=0.0, step=0.5)
-age = st.number_input("Age", min_value=18, max_value=100)
-
-st.divider()
-
-# ---------------- QUESTION SECTION ----------------
-st.subheader("Personality Questions")
-
-progress = (st.session_state.q_index + 1) / len(questions)
-st.progress(progress)
-
-q = questions[st.session_state.q_index]
-
-st.markdown(f"**Question {st.session_state.q_index + 1} of {len(questions)}**")
-st.markdown(q)
-
-answer = st.radio(
-"",
-[1,2,3,4,5],
-format_func=lambda x:{
-1:"Strongly Disagree",
-2:"Disagree",
-3:"Neutral",
-4:"Agree",
-5:"Strongly Agree"
-}[x],
-key=f"q_{st.session_state.q_index}"
-)
-
-# Save answer
-st.session_state.answers[f"question_{st.session_state.q_index}"] = answer
-
-# ---------------- NAVIGATION ----------------
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("Previous") and st.session_state.q_index > 0:
-        st.session_state.q_index -= 1
+    experience = st.number_input("Years of Experience", min_value=0.0, step=0.5)
 
 with col2:
-    if st.button("Next") and st.session_state.q_index < len(questions)-1:
-        st.session_state.q_index += 1
+    age = st.number_input("Age", min_value=18, max_value=100)
 
 st.divider()
+
+# ---------------- QUESTIONS ----------------
+st.header("Personality Questions")
+st.write("1 = Strongly Disagree | 5 = Strongly Agree")
+
+answers = {}
+
+for i, q in enumerate(questions):
+
+    st.markdown(f"### {i+1}. {q}")
+
+    answers[f"question_{i}"] = st.radio(
+        "",
+        [1,2,3,4,5],
+        format_func=lambda x:{
+            1:"Strongly Disagree",
+            2:"Disagree",
+            3:"Neutral",
+            4:"Agree",
+            5:"Strongly Agree"
+        }[x],
+        key=f"q{i}"
+    )
+
+    st.markdown("---")
 
 # ---------------- PERSONALITY CALCULATION ----------------
 def calculate_big_five(answers):
@@ -153,49 +152,50 @@ def calculate_big_five(answers):
         return np.mean(valid) if valid else 0
 
     return {
-        "Extraversion": safe_mean(scores[0:10]),
-        "Neuroticism": safe_mean(scores[10:20]),
-        "Agreeableness": safe_mean(scores[20:30]),
-        "Conscientiousness": safe_mean(scores[30:40]),
-        "Openness": safe_mean(scores[40:50])
+        "Extraversion":safe_mean(scores[0:10]),
+        "Neuroticism":safe_mean(scores[10:20]),
+        "Agreeableness":safe_mean(scores[20:30]),
+        "Conscientiousness":safe_mean(scores[30:40]),
+        "Openness":safe_mean(scores[40:50])
     }
 
-# ---------------- INTERPRETATION ----------------
+# ---------------- PERSONALITY INTERPRETATION ----------------
 def interpret_personality(bigfive):
 
     dominant_trait=max(bigfive,key=bigfive.get)
 
     descriptions={
 
-        "Openness":{
-        "desc":"You enjoy exploring new ideas and experiences. You are creative and curious about the world.",
-        "roles":"Product Designer, Researcher, Innovation Manager, Strategy Analyst"
-        },
+    "Openness":{
+    "desc":"You enjoy exploring new ideas and experiences. You are creative and curious.",
+    "roles":"Product Designer, Researcher, Innovation Manager, Strategy Analyst"
+    },
 
-        "Conscientiousness":{
-        "desc":"You are organized, disciplined and responsible. You like planning tasks and paying attention to details.",
-        "roles":"Project Manager, Operations Manager, Financial Analyst, Engineer"
-        },
+    "Conscientiousness":{
+    "desc":"You are organized, disciplined and responsible. You like planning and paying attention to details.",
+    "roles":"Project Manager, Operations Manager, Financial Analyst, Engineer"
+    },
 
-        "Extraversion":{
-        "desc":"You enjoy interacting with people and feel energized in social situations.",
-        "roles":"Sales Manager, Marketing Executive, HR Manager, Public Relations Specialist"
-        },
+    "Extraversion":{
+    "desc":"You are energetic and enjoy interacting with people in social situations.",
+    "roles":"Sales Manager, Marketing Executive, HR Manager, Public Relations Specialist"
+    },
 
-        "Agreeableness":{
-        "desc":"You value cooperation and harmony. You are kind and considerate toward others.",
-        "roles":"HR Specialist, Counselor, Customer Success Manager, Teacher"
-        },
+    "Agreeableness":{
+    "desc":"You value cooperation and relationships. You are kind and helpful toward others.",
+    "roles":"HR Specialist, Counselor, Customer Success Manager, Teacher"
+    },
 
-        "Neuroticism":{
-        "desc":"You may experience emotions strongly and sometimes feel stressed or worried.",
-        "roles":"Quality Assurance Analyst, Risk Analyst, Research Assistant, Data Analyst"
-        }
+    "Neuroticism":{
+    "desc":"You may feel emotions strongly and sometimes experience stress or worry.",
+    "roles":"Quality Assurance Analyst, Risk Analyst, Research Assistant, Data Analyst"
     }
 
-    return dominant_trait, descriptions
+    }
 
-# ---------------- SAVE TO DATABASE ----------------
+    return dominant_trait,descriptions
+
+# ---------------- SAVE DATA ----------------
 def save_to_database(name,job_role,company,experience,age,answers,personality,traits):
 
     data={
@@ -216,15 +216,37 @@ def save_to_database(name,job_role,company,experience,age,answers,personality,tr
     supabase.table("personality_assessments").insert(data).execute()
 
 # ---------------- SUBMIT ----------------
-if st.button("Submit Assessment"):
+if st.button("Submit Assessment", type="primary"):
 
-    if len(st.session_state.answers) < 50:
-        st.error("Please answer all questions before submitting.")
+    errors=[]
+
+    if not name.strip():
+        errors.append("Full Name is required")
+
+    if not job_role.strip():
+        errors.append("Job Role is required")
+
+    if not company.strip():
+        errors.append("Company name is required")
+
+    if experience<=0:
+        errors.append("Experience must be greater than 0")
+
+    if age<18:
+        errors.append("Age must be 18+")
+
+    if errors:
+
+        st.error("Please complete all required fields")
+
+        for e in errors:
+            st.warning(e)
+
     else:
 
-        bigfive = calculate_big_five(st.session_state.answers)
+        bigfive=calculate_big_five(answers)
 
-        trait, descriptions = interpret_personality(bigfive)
+        trait,descriptions=interpret_personality(bigfive)
 
         personality_percentages={}
 
@@ -237,14 +259,14 @@ if st.button("Submit Assessment"):
         company,
         experience,
         age,
-        st.session_state.answers,
+        answers,
         trait,
         personality_percentages
         )
 
         st.success("Assessment submitted successfully")
 
-        st.subheader("Candidate Profile")
+        st.header("Candidate Profile")
 
         st.write("Name:",name)
         st.write("Company:",company)
@@ -254,7 +276,7 @@ if st.button("Submit Assessment"):
 
         st.divider()
 
-        st.subheader("Personality Result")
+        st.header("Personality Result")
 
         st.success(f"Dominant Personality Trait: {trait}")
 
@@ -264,8 +286,10 @@ if st.button("Submit Assessment"):
 
         st.divider()
 
-        st.subheader("Personality Trait Scores")
+        st.header("Personality Trait Scores")
 
         for trait_name,percent in personality_percentages.items():
+
             st.write(f"{trait_name}: {percent}%")
+
             st.progress(percent/100)
