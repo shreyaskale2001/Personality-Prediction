@@ -125,7 +125,8 @@ for i, q in enumerate(questions):
     answers[i] = st.radio(
         "",
         [1,2,3,4,5],
-        format_func=lambda x: {
+        index=None,
+        format_func=lambda x:{
             1:"Strongly Disagree",
             2:"Disagree",
             3:"Neutral",
@@ -190,6 +191,9 @@ if st.button("Submit Assessment"):
 
     if not name or not job_role or not company:
         st.error("Please fill all personal information fields.")
+
+    elif None in answers.values():
+        st.error("Please answer all questions before submitting.")
 
     else:
 
