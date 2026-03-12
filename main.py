@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pickle
 from supabase import create_client
-import xgboost as xgb
+import xgboost as xgb 
 
 
 # ---------------- SUPABASE CONNECTION ----------------
