@@ -102,7 +102,6 @@ questions = [
     "I notice even minor details in my surroundings",
     "I tend to be messy",
     "I complete tasks right away",
-    "I occasionally misplace or forget where I put items",
     "I like things to be organized",
     "I sometimes avoid my responsibilities",
     "I like following a daily routine",
@@ -117,6 +116,7 @@ questions = [
     "I understand new things quickly",
     "I spend time thinking deeply about things",
     "I often think of new and creative ideas"
+
 ]
 
 st.header("Personality Questions")
