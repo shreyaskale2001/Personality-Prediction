@@ -1,5 +1,6 @@
 import streamlit as st
 import numpy as np
+import pickle
 from supabase import create_client
 
 # ---------------- SUPABASE CONNECTION ----------------
@@ -8,6 +9,9 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
+# ---------------- LOAD ML MODEL ----------------
+model = pickle.load(open("personality_model.pkl", "rb"))
+
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="wide")
 
@@ -15,9 +19,9 @@ st.set_page_config(page_title="Personality Assessment", layout="wide")
 st.markdown("""
 <style>
 h1 {font-size:30px !important;text-align:left !important;}
-h2 {font-size:20px !important;}
-h3 {font-size:17px !important;}
-p, label {font-size:14px !important;}
+h2 {font-size:22px !important;}
+h3 {font-size:18px !important;}
+p, label {font-size:15px !important;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -124,8 +128,9 @@ for i, q in enumerate(questions):
 
     st.markdown("---")
 
-# ---------------- CALCULATE PERSONALITY ----------------
+# ---------------- CALCULATE BIG FIVE ----------------
 def calculate_big_five(ans):
+
     scores = list(ans.values())
 
     return {
@@ -140,31 +145,32 @@ def calculate_big_five(ans):
 descriptions = {
 
 "Openness": {
-"desc": "You enjoy new experiences and are curious about the world. You appreciate art, adventure, and different ideas.",
+"desc": "You enjoy new experiences and are curious about the world. You appreciate art, adventure, and different ideas. You have a strong imagination and can quickly understand new concepts.",
 "roles": "Product Designer, Researcher, Innovation Manager, Strategy Analyst"
 },
 
 "Conscientiousness": {
-"desc": "You are disciplined and organized. You like planning things in advance and paying attention to details.",
+"desc": "You are disciplined and organized. You like planning things in advance, paying attention to details, and following schedules. You prefer structured and well-organized work.",
 "roles": "Project Manager, Operations Manager, Financial Analyst, Engineer"
 },
 
 "Extraversion": {
-"desc": "You enjoy being around people and often take the lead in social situations.",
+"desc": "You enjoy being around people and often take the lead in social situations. You are energetic, talkative, and comfortable being the center of attention.",
 "roles": "Sales Manager, Marketing Executive, HR Manager, Public Relations Specialist"
 },
 
 "Agreeableness": {
-"desc": "You value harmony and good relationships with others and enjoy helping people.",
+"desc": "You value harmony and good relationships with others. You are kind, helpful, and considerate of people’s feelings, which makes others feel comfortable around you.",
 "roles": "Human Resources Specialist, Counselor, Customer Success Manager, Teacher"
 },
 
 "Neuroticism": {
-"desc": "You experience emotions strongly and may sometimes feel stressed or worried.",
+"desc": "You may experience emotions strongly and sometimes feel stressed or worried. You can be sensitive to pressure and may prefer calm environments.",
 "roles": "Quality Assurance Analyst, Risk Analyst, Research Assistant, Data Analyst"
 }
 
 }
+
 
 # ---------------- SUBMIT ----------------
 if st.button("Submit Assessment"):
@@ -177,38 +183,43 @@ if st.button("Submit Assessment"):
 
     else:
 
-        bigfive = calculate_big_five(answers)
-        dominant_trait = max(bigfive, key=bigfive.get)
+        features = list(answers.values())
 
-        # ---------------- STORE DATA IN SUPABASE ----------------
+        bigfive = calculate_big_five(answers)
+
+        # ML MODEL PREDICTION
+        prediction = model.predict([features])[0]
+        dominant_trait = prediction
+
+        # ---------------- STORE DATA ----------------
         data = {
-            "name": name,
-            "company": company,
-            "job_role": job_role,
-            "age": int(age),
-            "year_experience": float(experience),
-            "answers": answers,
-            "dominant_trait": dominant_trait,
-            "extraversion": float(bigfive["Extraversion"]),
-            "neuroticism": float(bigfive["Neuroticism"]),
-            "agreeableness": float(bigfive["Agreeableness"]),
-            "openness": float(bigfive["Openness"])
+        "name": name,
+        "company": company,
+        "job_role": job_role,
+        "age": int(age),
+        "year_experience": float(experience),
+        "answers": answers,
+        "dominant_trait": dominant_trait,
+        "extraversion": round((bigfive["Extraversion"]/5)*100,2),
+        "neuroticism": round((bigfive["Neuroticism"]/5)*100,2),
+        "agreeableness": round((bigfive["Agreeableness"]/5)*100,2),
+        "openness": round((bigfive["Openness"]/5)*100,2)
         }
 
         try:
-            response = supabase.table("personality_assessments").insert(data).execute()
-            st.success("Data stored successfully!")
-            st.write(response)
+
+            supabase.table("personality_assessments").insert(data).execute()
+
+            st.success("Assessment submitted successfully!")
 
         except Exception as e:
+
             st.error("Database Error")
             st.write(e)
 
-        # st.success("Assessment submitted and stored in database successfully!")
-
         st.divider()
 
-        # ---------------- CANDIDATE PROFILE ----------------
+        # ---------------- PROFILE ----------------
         st.header("Candidate Profile")
 
         st.write("Name:", name)
@@ -219,7 +230,7 @@ if st.button("Submit Assessment"):
 
         st.divider()
 
-        # ---------------- PERSONALITY RESULT ----------------
+        # ---------------- RESULT ----------------
         st.header("Personality Result")
 
         st.success(f"Dominant Personality Trait: {dominant_trait}")
@@ -227,8 +238,6 @@ if st.button("Submit Assessment"):
         st.divider()
 
         st.subheader("Personality Description & Suitable Organizational Roles")
-
-        st.write("Below are descriptions of personality traits and roles that may suit these strengths.")
 
         for personality, info in descriptions.items():
 
