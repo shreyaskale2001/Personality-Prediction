@@ -177,6 +177,7 @@ descriptions = {
 }
 
 
+
 # ---------------- SUBMIT ----------------
 if st.button("Submit Assessment"):
 
@@ -198,17 +199,17 @@ if st.button("Submit Assessment"):
 
         # ---------------- STORE DATA ----------------
         data = {
-        "name": name,
-        "company": company,
-        "job_role": job_role,
-        "age": int(age),
-        "year_experience": float(experience),
-        "answers": answers,
-        "dominant_trait": dominant_trait,
-        "extraversion": round((bigfive["Extraversion"]/5)*100,2),
-        "neuroticism": round((bigfive["Neuroticism"]/5)*100,2),
-        "agreeableness": round((bigfive["Agreeableness"]/5)*100,2),
-        "openness": round((bigfive["Openness"]/5)*100,2)
+            "name": name,
+            "company": company,
+            "job_role": job_role,
+            "age": int(age),  # convert to native int
+            "year_experience": float(experience),  # convert to native float
+            "answers": {k: int(v) for k, v in answers.items()},  # convert all answers
+            "dominant_trait": dominant_trait,
+            "extraversion": float(round((bigfive["Extraversion"] / 5) * 100, 2)),
+            "neuroticism": float(round((bigfive["Neuroticism"] / 5) * 100, 2)),
+            "agreeableness": float(round((bigfive["Agreeableness"] / 5) * 100, 2)),
+            "openness": float(round((bigfive["Openness"] / 5) * 100, 2))
         }
 
         try:
