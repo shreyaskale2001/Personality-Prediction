@@ -222,42 +222,31 @@ if st.button("Submit Assessment"):
 
         # ML MODEL PREDICTION
         # Get prediction
+        # ---------------- ML MODEL PREDICTION ----------------
         prediction = model.predict([features])[0]
-
-        # If prediction is a NumPy type, convert to Python native
         if isinstance(prediction, (np.integer, np.int64)):
             prediction = int(prediction)
+        dominant_trait = trait_mapping[prediction] if isinstance(prediction, int) else str(prediction)
 
-        # If prediction is numeric, map to trait name
-        if isinstance(prediction, int):
-            dominant_trait = trait_mapping[prediction]
-        else:
-            # If prediction is already a string label
-            dominant_trait = str(prediction)
-            # ---------------- ML MODEL PREDICTION ----------------
-            prediction = model.predict([features])[0]
-            if isinstance(prediction, (np.integer, np.int64)):
-                prediction = int(prediction)
-            dominant_trait = trait_mapping[prediction] if isinstance(prediction, int) else str(prediction)
+        # ---------------- USE PREDICT_PROBA FOR TRAIT SCORES ----------------
+        probs = model.predict_proba([features])[0]  # probabilities for each trait
+        ml_trait_scores = {trait_mapping[i]: round(probs[i] * 100, 2) for i in range(len(probs))}
 
-            # ---------------- USE PREDICT_PROBA FOR TRAIT SCORES ----------------
-            probs = model.predict_proba([features])[0]  # probabilities for each class
-            ml_trait_scores = {trait_mapping[i]: round(probs[i] * 100, 2) for i in range(len(probs))}
 
         # ---------------- STORE DATA ----------------
         data = {
             "name": name,
             "company": company,
             "job_role": job_role,
-            "age": int(age),  # convert to native int
-            "year_experience": float(experience),  # convert to native float
-            "answers": {k: int(v) for k, v in answers.items()},  # convert all answers
+            "age": int(age),
+            "year_experience": float(experience),
+            "answers": {k: int(v) for k, v in answers.items()},
             "dominant_trait": dominant_trait,
-            "extraversion": float(round((bigfive["Extraversion"] / 5) * 100, 2)),
-            "neuroticism": float(round((bigfive["Neuroticism"] / 5) * 100, 2)),
-            "agreeableness": float(round((bigfive["Agreeableness"] / 5) * 100, 2)),
-            "openness": float(round((bigfive["Openness"] / 5) * 100, 2)),
-            "conscientiousness": float(round((bigfive["Conscientiousness"] / 5) * 100, 2))
+            "openness": ml_trait_scores["Openness"],
+            "conscientiousness": ml_trait_scores["Conscientiousness"],
+            "extraversion": ml_trait_scores["Extraversion"],
+            "agreeableness": ml_trait_scores["Agreeableness"],
+            "neuroticism": ml_trait_scores["Neuroticism"]
         }
 
         try:
@@ -302,8 +291,7 @@ if st.button("Submit Assessment"):
             st.info(f"Suitable Roles: {info['roles']}")
             st.markdown("---")
 
-        if st.button("Submit Assessment"):
-            # ... all code that calculates prediction, ml_trait_scores, and data insertion ...
+
 
             # ---------------- TRAIT SCORES ----------------
             st.header("Personality Trait Scores (ML-based)")
