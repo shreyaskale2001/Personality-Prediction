@@ -195,7 +195,14 @@ if st.button("Submit Assessment"):
             "openness": float(bigfive["Openness"])
         }
 
-        supabase.table("personality_assessments").insert(data).execute()
+        try:
+            response = supabase.table("personality_assessments").insert(data).execute()
+            st.success("Data stored successfully!")
+            st.write(response)
+
+        except Exception as e:
+            st.error("Database Error")
+            st.write(e)
 
         # st.success("Assessment submitted and stored in database successfully!")
 
