@@ -10,7 +10,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- LOAD ML MODEL ----------------
-model = pickle.load(open("personality_model.pkl", "rb"))
+model = pickle.load(open(".pkl", "rb"))
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="wide")
