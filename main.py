@@ -183,15 +183,15 @@ if st.button("Submit Assessment"):
         # ---------------- STORE DATA IN SUPABASE ----------------
         data = {
             "name": name,
-            "job_role": job_role,
             "company": company,
-            "age": age,
-            "experience": experience,
+            "job_role": job_role,
+            "age": int(age),
+            "year_experience": float(experience),
+            "answers": answers,
             "dominant_trait": dominant_trait,
             "extraversion": float(bigfive["Extraversion"]),
             "neuroticism": float(bigfive["Neuroticism"]),
             "agreeableness": float(bigfive["Agreeableness"]),
-            "conscientiousness": float(bigfive["Conscientiousness"]),
             "openness": float(bigfive["Openness"])
         }
 
