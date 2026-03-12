@@ -234,6 +234,15 @@ if st.button("Submit Assessment"):
         else:
             # If prediction is already a string label
             dominant_trait = str(prediction)
+            # ---------------- ML MODEL PREDICTION ----------------
+            prediction = model.predict([features])[0]
+            if isinstance(prediction, (np.integer, np.int64)):
+                prediction = int(prediction)
+            dominant_trait = trait_mapping[prediction] if isinstance(prediction, int) else str(prediction)
+
+            # ---------------- USE PREDICT_PROBA FOR TRAIT SCORES ----------------
+            probs = model.predict_proba([features])[0]  # probabilities for each class
+            ml_trait_scores = {trait_mapping[i]: round(probs[i] * 100, 2) for i in range(len(probs))}
 
         # ---------------- STORE DATA ----------------
         data = {
