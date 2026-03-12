@@ -195,9 +195,9 @@ if st.button("Submit Assessment"):
             "openness": float(bigfive["Openness"])
         }
 
-        supabase.table("personality_assessment").insert(data).execute()
+        supabase.table("personality_assessments").insert(data).execute()
 
-        st.success("Assessment submitted and stored in database successfully!")
+        # st.success("Assessment submitted and stored in database successfully!")
 
         st.divider()
 
