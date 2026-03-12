@@ -222,7 +222,7 @@ if st.button("Submit Assessment", key="submit_button"):
             st.markdown("---")
 
         # ---------------- TRAIT SCORES ----------------
-        st.header("Personality Trait Scores (ML-based)")
+        st.header("Personality Trait Scores")
         for trait, score in ml_trait_scores.items():
             st.write(f"{trait}: {score}%")
-            st.progress(score / 100)
+            st.progress(int(score))
