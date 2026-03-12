@@ -32,7 +32,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 with open("personality_model.pkl", "rb") as f:
-    model = pickle.load(f) 
+    model = pickle.load(f)
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="wide")
@@ -46,6 +46,14 @@ h3 {font-size:18px !important;}
 p, label {font-size:15px !important;}
 </style>
 """, unsafe_allow_html=True)
+
+trait_mapping = {
+    0: "Openness",
+    1: "Conscientiousness",
+    2: "Extraversion",
+    3: "Agreeableness",
+    4: "Neuroticism"
+}
 
 # ---------------- TITLE ----------------
 st.title("Personality Evaluation Survey")
