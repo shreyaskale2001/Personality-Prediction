@@ -247,7 +247,8 @@ if st.button("Submit Assessment"):
             "extraversion": float(round((bigfive["Extraversion"] / 5) * 100, 2)),
             "neuroticism": float(round((bigfive["Neuroticism"] / 5) * 100, 2)),
             "agreeableness": float(round((bigfive["Agreeableness"] / 5) * 100, 2)),
-            "openness": float(round((bigfive["Openness"] / 5) * 100, 2))
+            "openness": float(round((bigfive["Openness"] / 5) * 100, 2)),
+            "conscientiousness": float(round((bigfive["Conscientiousness"] / 5) * 100, 2))
         }
 
         try:
