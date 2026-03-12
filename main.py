@@ -304,10 +304,6 @@ if st.button("Submit Assessment"):
 
         # ---------------- TRAIT SCORES ----------------
         st.header("Personality Trait Scores")
-
-        for trait, score in bigfive.items():
-
-            percent = round((score/5)*100,2)
-
-            st.write(f"{trait}: {percent}%")
-            st.progress(percent/100)
+        for trait, score in ml_trait_scores.items():
+            st.write(f"{trait}: {score}%")
+            st.progress(score/100)
