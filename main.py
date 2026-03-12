@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import pickle
 from supabase import create_client
+import xgboost as xgb
+
 
 # ---------------- SUPABASE CONNECTION ----------------
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
@@ -10,7 +12,10 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- LOAD ML MODEL ----------------
-model = pickle.load(open("personality_model.pkl", "rb"))
+import pickle
+
+with open("personality_model.pkl", "rb") as f:
+    model = pickle.load(f)
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="wide")
