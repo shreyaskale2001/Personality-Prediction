@@ -1,46 +1,35 @@
 import streamlit as st
 import numpy as np
+from supabase import create_client
+
+# ---------------- SUPABASE CONNECTION ----------------
+SUPABASE_URL = st.secrets["SUPABASE_URL"]
+SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- PAGE CONFIG ----------------
-
 st.set_page_config(page_title="Personality Assessment", layout="wide")
 
 # ---------------- CUSTOM CSS ----------------
-
 st.markdown("""
 <style>
-
-h1 {
-font-size:30px !important;
-text-align:left !important;
-}
-
-h2 {
-font-size:20px !important;
-}
-
-h3 {
-font-size:17px !important;
-}
-
-p, label {
-font-size:14px !important;
-}
-
+h1 {font-size:30px !important;text-align:left !important;}
+h2 {font-size:20px !important;}
+h3 {font-size:17px !important;}
+p, label {font-size:14px !important;}
 </style>
 """, unsafe_allow_html=True)
 
 # ---------------- TITLE ----------------
-
 st.title("Personality Evaluation Survey")
 st.write("Answer all questions to discover your personality traits.")
 
 # ---------------- PERSONAL INFO ----------------
-
 st.header("Personal Information")
 
 name = st.text_input("Full Name")
-job_role = st.text_input("Current Job Role")
+job_role = st.text_input("Current Job Role (Specify the role you are currently working in)")
 company = st.text_input("Current Company")
 
 col1, col2 = st.columns(2)
@@ -54,9 +43,7 @@ with col2:
 st.divider()
 
 # ---------------- QUESTIONS ----------------
-
 questions = [
-
 "I enjoy being the center of attention at social events",
 "I usually don't talk much",
 "I feel comfortable when I am around people",
@@ -119,7 +106,6 @@ st.write("1 = Strongly Disagree | 5 = Strongly Agree")
 answers = {}
 
 for i, q in enumerate(questions):
-
     st.markdown(f"### {i+1}. {q}")
 
     answers[i] = st.radio(
@@ -139,54 +125,48 @@ for i, q in enumerate(questions):
     st.markdown("---")
 
 # ---------------- CALCULATE PERSONALITY ----------------
-
 def calculate_big_five(ans):
-
     scores = list(ans.values())
 
     return {
-
     "Extraversion": np.mean(scores[0:10]),
     "Neuroticism": np.mean(scores[10:20]),
     "Agreeableness": np.mean(scores[20:30]),
     "Conscientiousness": np.mean(scores[30:40]),
     "Openness": np.mean(scores[40:50])
-
     }
 
 # ---------------- DESCRIPTIONS ----------------
-
 descriptions = {
 
 "Openness": {
-"desc": "You enjoy new experiences and are curious about the world. You appreciate art, adventure, and different ideas. You have a strong imagination and can quickly understand new concepts.",
+"desc": "You enjoy new experiences and are curious about the world. You appreciate art, adventure, and different ideas.",
 "roles": "Product Designer, Researcher, Innovation Manager, Strategy Analyst"
 },
 
 "Conscientiousness": {
-"desc": "You are disciplined and organized. You like planning things in advance, paying attention to details, and following schedules. You prefer structured and well-organized work.",
+"desc": "You are disciplined and organized. You like planning things in advance and paying attention to details.",
 "roles": "Project Manager, Operations Manager, Financial Analyst, Engineer"
 },
 
 "Extraversion": {
-"desc": "You enjoy being around people and often take the lead in social situations. You are energetic, talkative, and comfortable being the center of attention.",
+"desc": "You enjoy being around people and often take the lead in social situations.",
 "roles": "Sales Manager, Marketing Executive, HR Manager, Public Relations Specialist"
 },
 
 "Agreeableness": {
-"desc": "You value harmony and good relationships with others. You are kind, helpful, and considerate of people’s feelings, which makes others feel comfortable around you.",
+"desc": "You value harmony and good relationships with others and enjoy helping people.",
 "roles": "Human Resources Specialist, Counselor, Customer Success Manager, Teacher"
 },
 
 "Neuroticism": {
-"desc": "You may experience emotions strongly and sometimes feel stressed or worried. You can be sensitive to pressure and may prefer calm environments.",
+"desc": "You experience emotions strongly and may sometimes feel stressed or worried.",
 "roles": "Quality Assurance Analyst, Risk Analyst, Research Assistant, Data Analyst"
 }
 
 }
 
 # ---------------- SUBMIT ----------------
-
 if st.button("Submit Assessment"):
 
     if not name or not job_role or not company:
@@ -198,13 +178,30 @@ if st.button("Submit Assessment"):
     else:
 
         bigfive = calculate_big_five(answers)
-
         dominant_trait = max(bigfive, key=bigfive.get)
+
+        # ---------------- STORE DATA IN SUPABASE ----------------
+        data = {
+            "name": name,
+            "job_role": job_role,
+            "company": company,
+            "age": age,
+            "experience": experience,
+            "dominant_trait": dominant_trait,
+            "extraversion": float(bigfive["Extraversion"]),
+            "neuroticism": float(bigfive["Neuroticism"]),
+            "agreeableness": float(bigfive["Agreeableness"]),
+            "conscientiousness": float(bigfive["Conscientiousness"]),
+            "openness": float(bigfive["Openness"])
+        }
+
+        supabase.table("personality_assessment").insert(data).execute()
+
+        st.success("Assessment submitted and stored in database successfully!")
 
         st.divider()
 
         # ---------------- CANDIDATE PROFILE ----------------
-
         st.header("Candidate Profile")
 
         st.write("Name:", name)
@@ -216,7 +213,6 @@ if st.button("Submit Assessment"):
         st.divider()
 
         # ---------------- PERSONALITY RESULT ----------------
-
         st.header("Personality Result")
 
         st.success(f"Dominant Personality Trait: {dominant_trait}")
@@ -225,22 +221,16 @@ if st.button("Submit Assessment"):
 
         st.subheader("Personality Description & Suitable Organizational Roles")
 
-        st.write(
-        "Below is the description of your dominant personality trait and some organizational roles that may suit your strengths."
-        )
+        st.write("Below are descriptions of personality traits and roles that may suit these strengths.")
 
         for personality, info in descriptions.items():
 
             st.markdown(f"### {personality}")
-
             st.write(info["desc"])
-
             st.info(f"Suitable Roles: {info['roles']}")
-
             st.markdown("---")
 
-        # ---------------- TRAIT SCORES AT BOTTOM ----------------
-
+        # ---------------- TRAIT SCORES ----------------
         st.header("Personality Trait Scores")
 
         for trait, score in bigfive.items():
@@ -248,5 +238,4 @@ if st.button("Submit Assessment"):
             percent = round((score/5)*100,2)
 
             st.write(f"{trait}: {percent}%")
-
             st.progress(percent/100)
