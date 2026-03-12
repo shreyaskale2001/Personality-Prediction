@@ -2,7 +2,24 @@ import streamlit as st
 import numpy as np
 import pickle
 from supabase import create_client
-import xgboost as xgb 
+import xgboost as xgb
+
+
+
+
+
+
+def convert_to_native(obj):
+    if isinstance(obj, (np.integer, np.int64)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64)):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {k: convert_to_native(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_to_native(v) for v in obj]
+    else:
+        return obj
 
 
 # ---------------- SUPABASE CONNECTION ----------------
@@ -50,6 +67,8 @@ with col2:
     age = st.number_input("Age", min_value=18, max_value=100)
 
 st.divider()
+
+
 
 # ---------------- QUESTIONS ----------------
 questions = [
@@ -213,8 +232,10 @@ if st.button("Submit Assessment"):
         }
 
         try:
+            data_serializable = convert_to_native(data)
+            supabase.table("personality_assessments").insert(data_serializable).execute()
 
-            supabase.table("personality_assessments").insert(data).execute()
+            # supabase.table("personality_assessments").insert(data).execute()
 
             st.success("Assessment submitted successfully!")
 
