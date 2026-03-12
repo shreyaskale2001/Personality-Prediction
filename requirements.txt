@@ -2,3 +2,6 @@ streamlit
 supabase
 numpy
 python-dotenv
+xgboost
+
+

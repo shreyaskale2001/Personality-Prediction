@@ -12,7 +12,7 @@ SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # ---------------- LOAD ML MODEL ----------------
-import pickle
+
 
 with open("personality_model.pkl", "rb") as f:
     model = pickle.load(f)
