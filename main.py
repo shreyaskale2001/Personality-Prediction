@@ -32,7 +32,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 
 with open("personality_model.pkl", "rb") as f:
-    model = pickle.load(f)
+    model = pickle.load(f) 
 
 # ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="Personality Assessment", layout="wide")
