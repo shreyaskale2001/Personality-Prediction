@@ -302,8 +302,11 @@ if st.button("Submit Assessment"):
             st.info(f"Suitable Roles: {info['roles']}")
             st.markdown("---")
 
-        # ---------------- TRAIT SCORES ----------------
-        st.header("Personality Trait Scores")
-        for trait, score in ml_trait_scores.items():
-            st.write(f"{trait}: {score}%")
-            st.progress(score/100)
+        if st.button("Submit Assessment"):
+            # ... all code that calculates prediction, ml_trait_scores, and data insertion ...
+
+            # ---------------- TRAIT SCORES ----------------
+            st.header("Personality Trait Scores (ML-based)")
+            for trait, score in ml_trait_scores.items():
+                st.write(f"{trait}: {score}%")
+                st.progress(score / 100)
