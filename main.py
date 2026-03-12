@@ -221,8 +221,19 @@ if st.button("Submit Assessment"):
         bigfive = calculate_big_five(answers)
 
         # ML MODEL PREDICTION
+        # Get prediction
         prediction = model.predict([features])[0]
-        dominant_trait = prediction
+
+        # If prediction is a NumPy type, convert to Python native
+        if isinstance(prediction, (np.integer, np.int64)):
+            prediction = int(prediction)
+
+        # If prediction is numeric, map to trait name
+        if isinstance(prediction, int):
+            dominant_trait = trait_mapping[prediction]
+        else:
+            # If prediction is already a string label
+            dominant_trait = str(prediction)
 
         # ---------------- STORE DATA ----------------
         data = {
