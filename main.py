@@ -229,10 +229,13 @@ if st.button("Submit Assessment"):
         dominant_trait = trait_mapping[prediction] if isinstance(prediction, int) else str(prediction)
 
         # ---------------- USE PREDICT_PROBA FOR TRAIT SCORES ----------------
-        probs = model.predict_proba([features])[0]  # probabilities for each trait
-        ml_trait_scores = {trait_mapping[i]: round(probs[i] * 100, 2) for i in range(len(probs))}
 
-
+        probs = model.predict_proba([features])[0]  # probabilities for each class
+        ml_trait_scores = {
+            trait_mapping[cls] if cls in trait_mapping else str(cls): round(prob * 100, 2)
+            for cls, prob in zip(model.classes_, probs)
+        }
+        
         # ---------------- STORE DATA ----------------
         data = {
             "name": name,
